@@ -1,35 +1,73 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+
+const WORD = 'REACT'; // secret word
 
 function App() {
-  const [count, setCount] = useState(0)
+    const [guesses, setGuesses] = useState<string[]>([]);
+    const [currentGuess, setCurrentGuess] = useState('');
+    const [gameStatus, setGameStatus] = useState('');
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    const handleChange = (e: any) => {
+        setCurrentGuess(e.target.value.toUpperCase());
+    };
+
+    const handleSubmit = (e: any) => {
+        e.preventDefault();
+        if (currentGuess.length !== 5) {
+            alert('Enter a 5-letter word');
+            return;
+        }
+        if (guesses.length >= 6) return;
+
+        const newGuesses = [...guesses, currentGuess];
+        setGuesses(newGuesses);
+        setCurrentGuess('');
+
+        if (currentGuess === WORD) {
+            setGameStatus('?? You guessed it!');
+        } else if (newGuesses.length === 6) {
+            setGameStatus(`?? Game over! The word was ${WORD}`);
+        }
+    };
+
+    const getColor = (letter: any, index: any) => {
+        if (WORD[index] === letter) return 'green';
+        if (WORD.includes(letter)) return 'yellow';
+        return 'gray';
+    };
+
+    return (
+        <div className="App">
+            <h1>Wordle Clone</h1>
+            <form onSubmit={handleSubmit}>
+                <input
+                    type="text"
+                    maxLength={5}
+                    value={currentGuess}
+                    onChange={handleChange}
+                    disabled={gameStatus ? true : false}
+                />
+                <button type="submit" disabled={gameStatus ? true : false}>Guess</button>
+            </form>
+            <div className="grid">
+                {guesses.map((guess, i) => (
+                    <div key={i} className="row">
+                        {guess.split('').map((letter, j) => (
+                            <div
+                                key={j}
+                                className="cell"
+                                style={{ backgroundColor: getColor(letter, j) }}
+                            >
+                                {letter}
+                            </div>
+                        ))}
+                    </div>
+                ))}
+            </div>
+            {gameStatus && <h2>{gameStatus}</h2>}
+        </div>
+    );
 }
 
-export default App
+export default App;

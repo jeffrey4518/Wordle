@@ -1,14 +1,18 @@
 ﻿import { useState } from 'react';
 import './../Content/bootstrap.min.css';
 import './App.css';
-import './components/GuessList';
 import GuessList from './components/GuessList';
+import Message from './components/Message';
 
 function App() {
     const [guesses, setGuesses] = useState<string[]>([]);
     const [scores, setScores] = useState<number[][]>([]);
     const [currentGuess, setCurrentGuess] = useState('');
-    const [gameStatus, setGameStatus] = useState('');
+    const [gameStatus, setGameStatus] = useState<any>(-1);
+
+    const handleRetry = () => {
+        window.location.reload();
+    };
 
     const handleChange = (e: any) => {
         setCurrentGuess(e.target.value.toUpperCase());
@@ -48,36 +52,52 @@ function App() {
                 setScores(newScores);
 
                 if (data.score.every((s: number) => s == 2)) {
-                    setGameStatus('🎉 You guessed it!');
+                    setGameStatus(1);
                 } else if (newGuesses.length === 6) {
-                    setGameStatus('😢 Game over!');
+                    setGameStatus(0);
                 }
             }
         }
         catch (err: any) {
-            setGameStatus('An error occurred: ' + (err as Error).message);
+            setGameStatus({
+                error: 'An error occurred: ' + (err as Error).message
+            });
             return;
         }
     };
     
     return (
         <div className="App card bg-light">
-            <div className="card-body">
-                <h1><b>Wordle</b></h1>
-                <form onSubmit={handleSubmit}>
-                    <input
-                        type="text"
-                        maxLength={5}
-                        value={currentGuess}
-                        onChange={handleChange}
-                        disabled={gameStatus ? true : false}
-                    />
-                    <button type="submit" disabled={gameStatus ? true : false}>Guess</button>
-                </form>
-
-                <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
-                {gameStatus && <h2>{gameStatus}</h2>}
-            </div>
+            <h1><b>Wordle</b></h1>
+            {gameStatus === 0 ? (
+                <div>
+                    <button
+                        className="btn-secondary"
+                        onClick={handleRetry}>
+                        Retry
+                    </button>
+                </div>
+            ) : (
+                <div className="card-body">
+                    <form onSubmit={handleSubmit}>
+                        <input
+                            type="text"
+                            maxLength={5}
+                            value={currentGuess}
+                            onChange={handleChange}
+                            disabled={gameStatus !== -1}
+                        />
+                        <button
+                            type="submit"
+                            className="btn-primary"
+                            disabled={gameStatus !== -1}>
+                            Guess
+                        </button>
+                    </form>
+                    <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
+                </div>
+            )}
+            <Message status={gameStatus} />
         </div>
     );
 }

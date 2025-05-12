@@ -1,10 +1,11 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import './App.css';
-
-const WORD = 'REACT'; // secret word
+import './components/GuessList';
+import GuessList from './components/GuessList';
 
 function App() {
     const [guesses, setGuesses] = useState<string[]>([]);
+    const [scores, setScores] = useState<number[][]>([]);
     const [currentGuess, setCurrentGuess] = useState('');
     const [gameStatus, setGameStatus] = useState('');
 
@@ -12,34 +13,55 @@ function App() {
         setCurrentGuess(e.target.value.toUpperCase());
     };
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = async (e: any) => {
         e.preventDefault();
+
         if (currentGuess.length !== 5) {
             alert('Enter a 5-letter word');
             return;
         }
-        if (guesses.length >= 6) return;
+        
+        try {
+            const response = await fetch('https://wordle-apis.vercel.app/api/validate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 'guess': currentGuess })
+            });
 
-        const newGuesses = [...guesses, currentGuess];
-        setGuesses(newGuesses);
-        setCurrentGuess('');
+            if (!response.ok) {
+                throw new Error('Server responded with status ${response.status}');
+            }
 
-        if (currentGuess === WORD) {
-            setGameStatus('?? You guessed it!');
-        } else if (newGuesses.length === 6) {
-            setGameStatus(`?? Game over! The word was ${WORD}`);
+            const data = await response.json();
+            if (!data.is_valid_word) {
+                alert('Not a valid word')
+            }
+            else {
+                const newGuesses = [...guesses, currentGuess];
+                setGuesses(newGuesses);
+                setCurrentGuess('');
+
+                const newScores = [...scores, data.score];
+                setScores(newScores);
+
+                if (data.score.every((s: number) => s == 2)) {
+                    setGameStatus('🎉 You guessed it!');
+                } else if (newGuesses.length === 6) {
+                    setGameStatus('😢 Game over!');
+                }
+            }
+        }
+        catch (err) {
+            setGameStatus('An error occurred: ${(err as Error).message}');
+            return;
         }
     };
-
-    const getColor = (letter: any, index: any) => {
-        if (WORD[index] === letter) return 'green';
-        if (WORD.includes(letter)) return 'yellow';
-        return 'gray';
-    };
-
+    
     return (
         <div className="App">
-            <h1>Wordle Clone</h1>
+            <h1>Wordle</h1>
             <form onSubmit={handleSubmit}>
                 <input
                     type="text"
@@ -50,21 +72,8 @@ function App() {
                 />
                 <button type="submit" disabled={gameStatus ? true : false}>Guess</button>
             </form>
-            <div className="grid">
-                {guesses.map((guess, i) => (
-                    <div key={i} className="row">
-                        {guess.split('').map((letter, j) => (
-                            <div
-                                key={j}
-                                className="cell"
-                                style={{ backgroundColor: getColor(letter, j) }}
-                            >
-                                {letter}
-                            </div>
-                        ))}
-                    </div>
-                ))}
-            </div>
+
+            <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
             {gameStatus && <h2>{gameStatus}</h2>}
         </div>
     );

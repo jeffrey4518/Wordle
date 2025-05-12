@@ -72,7 +72,7 @@ function App() {
             {gameStatus === 0 ? (
                 <div>
                     <button
-                        className="btn-secondary"
+                        className="btn btn-secondary"
                         onClick={handleRetry}>
                         Retry
                     </button>
@@ -89,7 +89,7 @@ function App() {
                         />
                         <button
                             type="submit"
-                            className="btn-primary"
+                            className="btn btn-primary"
                             disabled={gameStatus !== -1}>
                             Guess
                         </button>

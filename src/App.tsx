@@ -1,4 +1,5 @@
 ﻿import { useState } from 'react';
+import './../Content/bootstrap.min.css';
 import './App.css';
 import './components/GuessList';
 import GuessList from './components/GuessList';
@@ -53,28 +54,30 @@ function App() {
                 }
             }
         }
-        catch (err) {
-            setGameStatus('An error occurred: ${(err as Error).message}');
+        catch (err: any) {
+            setGameStatus('An error occurred: ' + (err as Error).message);
             return;
         }
     };
     
     return (
-        <div className="App">
-            <h1>Wordle</h1>
-            <form onSubmit={handleSubmit}>
-                <input
-                    type="text"
-                    maxLength={5}
-                    value={currentGuess}
-                    onChange={handleChange}
-                    disabled={gameStatus ? true : false}
-                />
-                <button type="submit" disabled={gameStatus ? true : false}>Guess</button>
-            </form>
+        <div className="App card bg-light">
+            <div className="card-body">
+                <h1><b>Wordle</b></h1>
+                <form onSubmit={handleSubmit}>
+                    <input
+                        type="text"
+                        maxLength={5}
+                        value={currentGuess}
+                        onChange={handleChange}
+                        disabled={gameStatus ? true : false}
+                    />
+                    <button type="submit" disabled={gameStatus ? true : false}>Guess</button>
+                </form>
 
-            <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
-            {gameStatus && <h2>{gameStatus}</h2>}
+                <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
+                {gameStatus && <h2>{gameStatus}</h2>}
+            </div>
         </div>
     );
 }

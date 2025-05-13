@@ -2,6 +2,7 @@
 import './../Content/bootstrap.min.css';
 import './App.css';
 import GuessList from './components/GuessList';
+import Keyboard from './components/Keyboard';
 import Message from './components/Message';
 
 function App() {
@@ -10,22 +11,35 @@ function App() {
     const [currentGuess, setCurrentGuess] = useState('');
     const [gameStatus, setGameStatus] = useState<any>(-1);
 
-    const handleRetry = () => {
-        window.location.reload();
-    };
+    const handleKeyClick = (key: string) => {
+        if (key === 'ENTER') {
+            currentGuess.length === 5 ? validateGuess() : alert('Enter a 5-letter word');
+        } else if (key === '⌫') {
+            setCurrentGuess((prev) => prev.slice(0, -1));
+        } else if (currentGuess.length < 5) {
+            setCurrentGuess((prev) => prev + key);
+        }
+    }
 
     const handleChange = (e: any) => {
-        setCurrentGuess(e.target.value.toUpperCase());
+        const guess = e.target.value;
+        if (guess.toUpperCase() != guess.toLowerCase()) {
+            setCurrentGuess(e.target.value.toUpperCase());
+        }
     };
 
-    const handleSubmit = async (e: any) => {
+    const handleSubmit = (e: any) => {
         e.preventDefault();
 
         if (currentGuess.length !== 5) {
             alert('Enter a 5-letter word');
             return;
+        } else {
+            validateGuess();
         }
-        
+    };
+
+    const validateGuess = async () => {
         try {
             const response = await fetch('https://wordle-apis.vercel.app/api/validate', {
                 method: 'POST',
@@ -64,8 +78,12 @@ function App() {
             });
             return;
         }
+    }
+
+    const handleRetry = () => {
+        window.location.reload();
     };
-    
+
     return (
         <div className="App card bg-light">
             <h2><b>Wordle</b></h2>
@@ -97,6 +115,7 @@ function App() {
                         </button>
                     </form>
                     <GuessList pastGuesses={guesses} pastScores={scores} currentGuess={currentGuess} />
+                    {gameStatus === -1 && <Keyboard onKeyClick={handleKeyClick} />}
                 </div>
             )}
             <Message status={gameStatus} />

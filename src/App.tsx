@@ -23,7 +23,7 @@ function App() {
 
     const handleChange = (e: any) => {
         const guess = e.target.value;
-        if (guess.toUpperCase() != guess.toLowerCase()) {
+        if (guess.toUpperCase() != guess.toLowerCase() || guess === "") {
             setCurrentGuess(e.target.value.toUpperCase());
         }
     };

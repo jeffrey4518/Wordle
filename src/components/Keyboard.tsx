@@ -1,6 +1,6 @@
 ﻿import './../App.css';
 
-interface Props {
+interface Prop {
     onKeyClick: (key: string) => void;
 }
 
@@ -10,7 +10,7 @@ const keyboardRows = [
     ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫'],
 ];
 
-function Keyboard({ onKeyClick }: Props) {
+function Keyboard({ onKeyClick }: Prop) {
 
     return (
         <div className="keyboard">

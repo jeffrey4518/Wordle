@@ -8,11 +8,13 @@ function Message({ status }: Props) {
         <div className="message">
             {status === 1 ? (
                 <h2>
+                    <img src="victory.png" />
                     <b>You guessed it!</b>
                     <img src="victory.png" />
                 </h2>
             ) : status === 0 ? (
                 <h2>
+                    <img src="gameover.png" />
                     <b>Game Over!</b>
                     <img src="gameover.png" />
                 </h2>

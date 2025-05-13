@@ -68,7 +68,7 @@ function App() {
     
     return (
         <div className="App card bg-light">
-            <h1><b>Wordle</b></h1>
+            <h2><b>Wordle</b></h2>
             {gameStatus === 0 ? (
                 <div>
                     <button
@@ -86,6 +86,8 @@ function App() {
                             value={currentGuess}
                             onChange={handleChange}
                             disabled={gameStatus !== -1}
+                            autoFocus={true}
+                            onBlur={({target}) => target.focus() }
                         />
                         <button
                             type="submit"
